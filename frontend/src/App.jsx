@@ -1,9 +1,9 @@
-import React from 'react'
+import Claim from "./pages/Claim.jsx";
 
 const App = () => {
-  return (
-    <div>App</div>
-  )
-}
+    return (
+        <Claim />
+    );
+};
 
-export default App
+export default App;
