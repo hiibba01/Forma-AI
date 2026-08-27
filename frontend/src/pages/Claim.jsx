@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Sparkles, ShieldCheck, ArrowRight, LoaderCircle, AlertCircle, FileText, Brain, Lock, CheckCircle2 } from "lucide-react";
 import API from "../api/axios.js";
 import formaLogo from "../assets/formaa.png"
+import DynamicForm from "../components/DynamicForm.jsx";
 
 const Claim = () => {
     const [form, setForm] = useState(null);
@@ -241,80 +242,7 @@ const Claim = () => {
 
                     <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl">
 
-                        {fields.length === 0 ? (
-
-                            <div className="py-16 text-center">
-
-                                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-orange-500/10 flex items-center justify-center">
-                                    <FileText size={25} className="text-orange-400" />
-                                </div>
-
-                                <p className="text-zinc-500">No form fields found.</p>
-
-                            </div>
-
-                        ) : (
-
-                            <div className="grid md:grid-cols-2 gap-5">
-
-                                {fields.map((field) => (
-
-                                    <div key={field.id} className="group p-5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-200">
-
-                                        <div className="flex items-center justify-between mb-3">
-
-                                            <label className="font-semibold text-zinc-200">{field.label}</label>
-
-                                            {field.required && (
-                                                <span className="flex items-center gap-1 text-xs text-orange-400">
-                                                    <CheckCircle2 size={13} />
-                                                    Required
-                                                </span>
-                                            )}
-
-                                        </div>
-
-                                        <div className="h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center px-4 group-hover:border-zinc-700 transition">
-
-                                            <span className="text-sm text-zinc-600">
-                                                {field.type === "select"
-                                                    ? "Select an option..."
-                                                    : field.type === "date"
-                                                        ? "Choose a date..."
-                                                        : field.type === "checkbox"
-                                                            ? "Checkbox"
-                                                            : "Enter your answer..."
-                                                }
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                ))}
-
-                            </div>
-                        )}
-
-                        {/* Continue */}
-
-                        {fields.length > 0 && (
-
-                            <div className="mt-8 pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-
-                                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                                    <Lock size={15} className="text-orange-500" />
-                                    <span>Your information is securely processed.</span>
-                                </div>
-
-                                <button className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 font-bold shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                    Continue
-                                    <ArrowRight size={18} />
-                                </button>
-
-                            </div>
-
-                        )}
+                        <DynamicForm fields={fields} />
 
                     </div>
 

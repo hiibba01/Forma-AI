@@ -1,72 +1,36 @@
-import { version } from "mongoose";
-
 const insuranceForm = {
     formId: "auto-insurance-claim",
 
     name: "Auto Insurance Claim",
 
-    description:
-        "Dynamic form for filing an automobile insurance claim.",
+    description: "Dynamic form for filing an automobile insurance claim.",
 
     version: 1,
-    
+
     status: "published",
 
-     fields: [
+    fields: [
         {
             id: "incidentType",
-            type: "select",
             label: "What type of incident occurred?",
+            type: "select",
             required: true,
-
             options: [
                 {
                     label: "Animal Collision",
                     value: "animal_collision"
                 },
                 {
-                    label: "Accident",
-                    value: "accident"
+                    label: "Vehicle Collision",
+                    value: "vehicle_collision"
                 },
                 {
                     label: "Theft",
                     value: "theft"
-                }
-            ]
-        },
-
-        {
-            id: "incidentDate",
-            type: "date",
-            label: "When did the incident occur?",
-            required: true
-        },
-
-        {
-            id: "vehicle",
-            type: "text",
-            label: "What is the vehicle make?",
-            required: true
-        },
-
-        {
-            id: "damage",
-            type: "select",
-            label: "What was damaged?",
-            required: true,
-
-            options: [
-                {
-                    label: "Windshield",
-                    value: "windshield"
                 },
                 {
-                    label: "Bumper",
-                    value: "bumper"
-                },
-                {
-                    label: "Engine",
-                    value: "engine"
+                    label: "Weather Damage",
+                    value: "weather_damage"
                 },
                 {
                     label: "Other",
@@ -76,88 +40,104 @@ const insuranceForm = {
         },
 
         {
-            id: "location",
+            id: "vehicle",
+            label: "What vehicle was involved?",
             type: "text",
-            label: "Where did the incident occur?",
+            required: true,
+            placeholder: "e.g. Honda Civic"
+        },
+
+        {
+            id: "damage",
+            label: "What was damaged?",
+            type: "text",
+            required: true,
+            placeholder: "e.g. Windshield, bumper, door..."
+        },
+
+        {
+            id: "incidentDate",
+            label: "When did the incident occur?",
+            type: "date",
             required: true
         },
 
         {
-            id: "animalType",
-            type: "text",
-            label: "What animal was involved?",
-
+            id: "description",
+            label: "Describe what happened",
+            type: "textarea",
             required: true,
+            placeholder: "Describe the incident in detail..."
+        },
 
+        {
+            id: "anotherVehicle",
+            label: "Was another vehicle involved?",
+            type: "select",
+            required: true,
+            options: [
+                {
+                    label: "Yes",
+                    value: "yes"
+                },
+                {
+                    label: "No",
+                    value: "no"
+                }
+            ]
+        },
+
+        {
+            id: "otherDriverName",
+            label: "What is the other driver's name?",
+            type: "text",
+            required: true,
+            placeholder: "Enter the driver's name...",
             showIf: {
-                field: "incidentType",
-                operator: "equals",
-                value: "animal_collision"
+                field: "anotherVehicle",
+                value: "yes"
+            }
+        },
+
+        {
+            id: "otherInsurance",
+            label: "What is the other driver's insurance company?",
+            type: "text",
+            required: true,
+            placeholder: "e.g. State Farm, Geico...",
+            showIf: {
+                field: "anotherVehicle",
+                value: "yes"
+            }
+        },
+
+        {
+            id: "otherVehicleNumber",
+            label: "What is the other vehicle's registration number?",
+            type: "text",
+            required: true,
+            placeholder: "Enter registration number...",
+            showIf: {
+                field: "anotherVehicle",
+                value: "yes"
             }
         },
 
         {
             id: "policeReport",
-            type: "checkbox",
             label: "Was a police report filed?",
-
-            showIf: {
-                field: "incidentType",
-                operator: "equals",
-                value: "accident"
-            }
-        },
-
-        {
-            id: "injuries",
-            type: "checkbox",
-            label: "Were there any injuries?",
-
-            showIf: {
-                field: "incidentType",
-                operator: "equals",
-                value: "accident"
-            }
-        },
-
-        {
-            id: "medicalTreatment",
-            type: "text",
-            label: "Describe the medical treatment received.",
-
+            type: "select",
             required: true,
-
-            showIf: {
-                field: "injuries",
-                operator: "equals",
-                value: true
-            }
-        },
-
-        {
-            id: "stolenItems",
-            type: "text",
-            label: "What items were stolen?",
-
-            required: true,
-
-            showIf: {
-                field: "incidentType",
-                operator: "equals",
-                value: "theft"
-            }
-        },
-
-        {
-            id: "theftPoliceReport",
-            type: "checkbox",
-            label: "Was the theft reported to the police?",
-
-            showIf: {
-                field: "incidentType",
-                operator: "equals",
-                value: "theft"
-            }
+            options: [
+                {
+                    label: "Yes",
+                    value: "yes"
+                },
+                {
+                    label: "No",
+                    value: "no"
+                }
+            ]
         }
     ]
 };
