@@ -8,12 +8,12 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed": "node seed/seedForms.js"
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^2.19.0",
     "@langchain/core": "^1.2.9",
     "@langchain/openai": "^1.5.10",
     "bcryptjs": "^3.0.3",

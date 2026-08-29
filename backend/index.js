@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import formRoutes from "./routes/formRoutes.js"
+import aiRoutes from "./routes/aiRoutes.js"
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/forms", formRoutes);
-
+app.use("/api/ai", aiRoutes);
 
 app.get("/", (req,res) => {
     res.json({
