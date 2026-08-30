@@ -1,15 +1,27 @@
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 
-const DynamicForm = ({ fields }) => {
+const DynamicForm = ({ fields,  extractedData }) => {
     const {
         register,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors }
     } = useForm({
         mode: "onSubmit"
     });
+
+    useEffect(() => {
+    if (!extractedData) {
+        return;
+    }
+
+    Object.entries(extractedData).forEach(([fieldId, value]) => {
+        setValue(fieldId, value);
+        });
+    }, [extractedData, setValue]);
 
     const values = watch();
 

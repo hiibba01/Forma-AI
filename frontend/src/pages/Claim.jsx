@@ -8,6 +8,11 @@ const Claim = () => {
     const [form, setForm] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [story, setStory] = useState("");
+    const [extractedData, setExtractedData] = useState({});
+    const [extracting, setExtracting] = useState(false);
+
+    const fields = form?.fields || [];
 
     useEffect(() => {
         const fetchForm = async () => {
@@ -27,6 +32,30 @@ const Claim = () => {
 
         fetchForm();
     }, []);
+
+    const handleExtract = async () => {
+    if (!story.trim()) {
+        return;
+    }
+
+    try {
+        setExtracting(true);
+
+        const response = await API.post("/ai/extract", {
+            story,
+            fields
+        });
+
+        console.log("AI extracted data:", response.data);
+
+        setExtractedData(response.data.data);
+
+    } catch (error) {
+        console.error("AI extraction failed:", error);
+    } finally {
+        setExtracting(false);
+    }
+};
 
     if (loading) {
         return (
@@ -56,7 +85,7 @@ const Claim = () => {
         );
     }
 
-    const fields = form?.fields || [];
+    
 
     return (
         <div className="min-h-screen bg-zinc-950 text-white overflow-hidden">
@@ -142,7 +171,10 @@ const Claim = () => {
 
                         </div>
 
-                        <textarea placeholder="Example: I hit a deer on I-95 yesterday in my Honda, and the windshield shattered..." className="w-full min-h-40 resize-none rounded-2xl bg-zinc-950 border border-zinc-800 px-5 py-4 text-white placeholder:text-zinc-600 outline-none transition duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10" />
+                        <textarea 
+                            value={story}
+                            onChange={(e) => setStory(e.target.value)}
+                            placeholder="Example: I hit a deer on I-95 yesterday in my Honda, and the windshield shattered..." className="w-full min-h-40 resize-none rounded-2xl bg-zinc-950 border border-zinc-800 px-5 py-4 text-white placeholder:text-zinc-600 outline-none transition duration-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10" />
 
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-5">
 
@@ -151,9 +183,12 @@ const Claim = () => {
                                 <span>AI extracts information from your story</span>
                             </div>
 
-                            <button className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 hover:from-orange-400 hover:via-amber-400 hover:to-orange-400 font-bold shadow-xl shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <button 
+                                onClick={handleExtract}
+                                disabled={extracting}
+                                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 hover:from-orange-400 hover:via-amber-400 hover:to-orange-400 font-bold shadow-xl shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2">
                                 <Sparkles size={18} />
-                                Extract with AI
+                                {extracting ? "Extracting..." : "Extract with AI"}
                             </button>
 
                         </div>
@@ -242,7 +277,7 @@ const Claim = () => {
 
                     <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl">
 
-                        <DynamicForm fields={fields} />
+                       <DynamicForm fields={fields} extractedData={extractedData} />
 
                     </div>
 
