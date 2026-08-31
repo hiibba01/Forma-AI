@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import formRoutes from "./routes/formRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
+import claimRoutes from "./routes/claimRoutes.js"
 
 dotenv.config();
 
@@ -19,6 +20,8 @@ app.use(cookieParser());
 
 app.use("/api/forms", formRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/claims", claimRoutes);
+
 
 app.get("/", (req,res) => {
     res.json({

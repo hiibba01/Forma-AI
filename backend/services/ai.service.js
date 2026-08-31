@@ -34,6 +34,12 @@ User's description:
 
 "${story}"
 
+Today's date is ${new Date().toISOString().split("T")[0]}.
+
+For date fields, always return the date in YYYY-MM-DD format.
+
+If the user uses relative dates such as "today", "yesterday", or "two days ago", convert them to the corresponding actual date.
+
 Return ONLY valid JSON.
 
 The JSON keys must match the field IDs exactly.

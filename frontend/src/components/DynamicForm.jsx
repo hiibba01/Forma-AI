@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, ChevronDown } from "lucide-react";
+import API from "../api/axios.js";
 
 const DynamicForm = ({ fields,  extractedData }) => {
     const {
@@ -12,6 +13,9 @@ const DynamicForm = ({ fields,  extractedData }) => {
     } = useForm({
         mode: "onSubmit"
     });
+
+    const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
 
     useEffect(() => {
     if (!extractedData) {
@@ -35,8 +39,25 @@ const DynamicForm = ({ fields,  extractedData }) => {
         return currentValue === field.showIf.value;
     };
 
-    const onSubmit = (data) => {
-        console.log("Form submitted:", data);
+    const onSubmit = async(data) => {
+        try {
+            setSubmitting(true);
+            const response = await API.post("/claims", {
+                formId: "auto-insurance-claim",
+                data
+            });
+
+            console.log("Claim submitted:", response.data);
+
+            setSubmitted(true);
+
+        } catch (error) {
+
+            console.error("Claim submission failed:", error);
+            
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     if (!fields || fields.length === 0) {
@@ -124,8 +145,8 @@ const DynamicForm = ({ fields,  extractedData }) => {
                     <span>Your information is securely processed.</span>
                 </div>
 
-                <button type="submit" className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 font-bold shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                    Submit Claim
+                <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 font-bold shadow-xl shadow-orange-500/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    {submitting ? "Submitting..." : "Submit Claim"}
                 </button>
             </div>
         </form>
