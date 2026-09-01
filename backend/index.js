@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import formRoutes from "./routes/formRoutes.js"
 import aiRoutes from "./routes/aiRoutes.js"
 import claimRoutes from "./routes/claimRoutes.js"
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/api/forms", formRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/claims", claimRoutes);
+app.use("/api/auth", authRoutes);
 
 
 app.get("/", (req,res) => {

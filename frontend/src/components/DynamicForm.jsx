@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import API from "../api/axios.js";
 
-const DynamicForm = ({ fields,  extractedData }) => {
+const DynamicForm = ({ fields,  extractedData, onNewClaim }) => {
     const {
         register,
         handleSubmit,
         watch,
         setValue,
+        reset,
         formState: { errors }
     } = useForm({
         mode: "onSubmit"
@@ -59,6 +60,47 @@ const DynamicForm = ({ fields,  extractedData }) => {
             setSubmitting(false);
         }
     };
+
+    if (submitted) {
+    return (
+        <div className="py-20 flex items-center justify-center">
+            <div className="max-w-lg w-full text-center bg-zinc-950 border border-orange-500/20 rounded-3xl p-10 shadow-2xl shadow-orange-500/10">
+                
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-orange-500/10 flex items-center justify-center">
+                    <CheckCircle2 size={42} className="text-orange-400" />
+                </div>
+
+                <h2 className="text-3xl font-bold text-white">
+                    Claim Submitted Successfully
+                </h2>
+
+                <p className="mt-3 text-zinc-500 leading-relaxed">
+                    Your insurance claim has been securely submitted.
+                    Forma AI has saved your information successfully.
+                </p>
+
+                <div className="mt-8 p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            reset();
+                            setSubmitted(false);
+                            onNewClaim();
+                        }}
+                        className="mt-6 w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 font-bold transition-all hover:-translate-y-0.5"
+                        >
+                        Submit Another Claim
+                    </button>
+                    <div className="flex items-center justify-center gap-2 text-sm text-zinc-400">
+                        <CheckCircle2 size={17} className="text-orange-400" />
+                        <span>Your claim has been recorded</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
+}
 
     if (!fields || fields.length === 0) {
         return (

@@ -12,6 +12,11 @@ const Claim = () => {
     const [extractedData, setExtractedData] = useState({});
     const [extracting, setExtracting] = useState(false);
 
+    const handleNewClaim = () => {
+        setStory("");
+        setExtractedData(null);
+    };
+
     const fields = form?.fields || [];
 
     useEffect(() => {
@@ -277,7 +282,7 @@ const Claim = () => {
 
                     <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-8 shadow-2xl">
 
-                       <DynamicForm fields={fields} extractedData={extractedData} />
+                       <DynamicForm fields={fields} extractedData={extractedData} onNewClaim = {handleNewClaim} />
 
                     </div>
 
