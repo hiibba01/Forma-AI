@@ -14,6 +14,7 @@ export const submitClaim = async(req, res)=>{
         }
 
         const claim = await Claim.create({
+            userId: req.user._id,
             formId,
             data
         });
@@ -36,3 +37,24 @@ export const submitClaim = async(req, res)=>{
     }
 
 }
+
+export const getMyClaims = async (req, res) => {
+    try {
+        const claims = await Claim.find({
+            userId: req.user._id
+        }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: claims
+        });
+
+    } catch (error) {
+        console.error("Fetch claims error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch claims."
+        });
+    }
+};

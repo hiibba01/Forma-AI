@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const claimSchema = new mongoose.Schema(
     {
+
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
         formId: {
             type: String,
             required: true
