@@ -19,14 +19,51 @@ const DynamicForm = ({ fields,  extractedData, onNewClaim }) => {
     const [submitted, setSubmitted] = useState(false);
 
     useEffect(() => {
-    if (!extractedData) {
-        return;
-    }
+        if (!extractedData) {
+            return;
+        }
 
-    Object.entries(extractedData).forEach(([fieldId, value]) => {
-        setValue(fieldId, value);
+        Object.entries(extractedData).forEach(([fieldId, value]) => {
+            const field = fields.find((item) => item.id === fieldId);
+
+            if (field?.type === "date") {
+                const text = String(value).toLowerCase().trim();
+
+                let date = null;
+
+                if (text.includes("yesterday")) {
+                    date = new Date();
+                    date.setDate(date.getDate() - 1);
+                } else if (text.includes("today")) {
+                    date = new Date();
+                } else if (text.includes("tomorrow")) {
+                    date = new Date();
+                    date.setDate(date.getDate() + 1);
+                } else {
+                    const parsedDate = new Date(value);
+
+                    if (!isNaN(parsedDate.getTime())) {
+                        date = parsedDate;
+                    }
+                }
+
+                if (date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const day = String(date.getDate()).padStart(2, "0");
+
+                    setValue(
+                        fieldId,
+                        `${year}-${month}-${day}`
+                    );
+                }
+
+                return;
+            }
+
+            setValue(fieldId, value);
         });
-    }, [extractedData, setValue]);
+    }, [extractedData, setValue, fields]);
 
     const values = watch();
 

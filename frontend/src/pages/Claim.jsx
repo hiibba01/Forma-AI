@@ -11,6 +11,8 @@ const Claim = () => {
     const [story, setStory] = useState("");
     const [extractedData, setExtractedData] = useState({});
     const [extracting, setExtracting] = useState(false);
+    const [engineStatus, setEngineStatus] = useState(null);
+    
 
     const handleNewClaim = () => {
         setStory("");
@@ -38,6 +40,27 @@ const Claim = () => {
         fetchForm();
     }, []);
 
+        useEffect(() => {
+        const fetchEngineStatus = async () => {
+            try {
+                const response = await fetch(
+                    "http://127.0.0.1:8001/status"
+                );
+
+                console.log("STATUS RESPONSE:", response);
+
+                const data = await response.json();
+                console.log("STATUS DATA:", data);
+
+                setEngineStatus(data);
+            } catch (error) {
+                console.error("Failed to fetch AI engine status:", error);
+            }
+        };
+
+        fetchEngineStatus();
+    }, []);
+
     const handleExtract = async () => {
     if (!story.trim()) {
         return;
@@ -54,6 +77,8 @@ const Claim = () => {
         console.log("AI extracted data:", response.data);
 
         setExtractedData(response.data.data);
+
+        console.log("AI extracted fields:", Object.keys(response.data.data));
 
     } catch (error) {
         console.error("AI extraction failed:", error);
@@ -155,6 +180,96 @@ const Claim = () => {
                     </p>
                 </section>
 
+
+                {/* AI Engine Status */}
+
+                {engineStatus && (
+                    <section className="mb-6">
+                        <div className="rounded-2xl bg-zinc-900 border border-orange-500/20 overflow-hidden">
+
+                            <div className="px-5 py-4 flex items-center justify-between">
+
+                                <div className="flex items-center gap-3">
+
+                                    <div
+                                        className={`w-2.5 h-2.5 rounded-full ${
+                                            engineStatus.available
+                                                ? "bg-green-400"
+                                                : "bg-orange-400"
+                                        }`}
+                                    />
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">
+                                            AI Engine
+                                        </p>
+
+                                        <p className="text-xs text-zinc-500 mt-0.5">
+                                            {engineStatus.available
+                                                ? "Running locally on Snapdragon NPU"
+                                                : "Development mode • Snapdragon deployment ready"}
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                <span
+                                    className={`text-xs font-medium px-3 py-1.5 rounded-full ${
+                                        engineStatus.available
+                                            ? "bg-green-500/10 text-green-300 border border-green-500/20"
+                                            : "bg-orange-500/10 text-orange-300 border border-orange-500/20"
+                                    }`}
+                                >
+                                    {engineStatus.available
+                                        ? "GenieX QAIRT"
+                                        : "Gemini Fallback"}
+                                </span>
+
+                            </div>
+
+                            <div className="border-t border-zinc-800 px-5 py-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                                        Model
+                                    </p>
+                                    <p className="text-xs text-zinc-300 mt-1">
+                                        {engineStatus.model}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                                        Precision
+                                    </p>
+                                    <p className="text-xs text-zinc-300 mt-1">
+                                        {engineStatus.precision}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                                        Runtime
+                                    </p>
+                                    <p className="text-xs text-zinc-300 mt-1">
+                                        {engineStatus.runtime}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                                        Target
+                                    </p>
+                                    <p className="text-xs text-zinc-300 mt-1">
+                                        {engineStatus.device}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </section>
+                )}
                 {/* Magic Input */}
 
                 <section className="relative mb-10">
@@ -199,6 +314,149 @@ const Claim = () => {
                         </div>
                     </div>
                 </section>
+
+
+
+                {/* AI Extraction Result */}
+
+                {Object.keys(extractedData || {}).length > 0 && (
+                    <section className="mb-10">
+                        <div className="bg-zinc-900 border border-orange-500/20 rounded-3xl p-6 md:p-8 shadow-xl shadow-orange-500/5">
+
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <p className="text-xs font-bold tracking-widest text-orange-500 mb-2">
+                                        AI ANALYSIS
+                                    </p>
+
+                                    <h2 className="text-2xl font-bold text-white">
+                                        We understood your claim
+                                    </h2>
+
+                                    <p className="text-zinc-500 mt-1">
+                                        Review the information extracted from your story.
+                                    </p>
+                                </div>
+
+                                <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full bg-orange-500/10 border border-orange-500/20">
+                                    <CheckCircle2 size={16} className="text-orange-400" />
+                                    <span className="text-sm text-orange-300">
+                                        AI Extracted
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                {Object.entries(extractedData).map(([fieldId, value]) => {
+
+                                    const field = fields.find(
+                                        (item) => item.id === fieldId || item.name === fieldId
+                                    );
+
+                                    return (
+                                        <div
+                                            key={fieldId}
+                                            className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800"
+                                        >
+                                            <p className="text-xs uppercase tracking-wider text-zinc-600 mb-2">
+                                                {field?.label || fieldId}
+                                            </p>
+
+                                            <p className="text-white font-medium">
+                                                {String(value)}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+
+
+                                
+                            </div>
+
+
+                            {/* Missing Information */}
+
+                            {(() => {
+                                const missingFields = fields.filter((field) => {
+                                    const isVisible =
+                                        !field.showIf ||
+                                        extractedData[field.showIf.field] === field.showIf.value;
+
+                                    const isMissing =
+                                        field.required &&
+                                        isVisible &&
+                                        !extractedData[field.id];
+
+                                    return isMissing;
+                                });
+
+                                if (missingFields.length === 0) {
+                                    return (
+                                        <div className="mt-6 p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
+                                            <div className="flex items-center gap-3">
+                                                <CheckCircle2
+                                                    size={18}
+                                                    className="text-green-400"
+                                                />
+
+                                                <div>
+                                                    <p className="text-sm font-semibold text-green-300">
+                                                        All required information found
+                                                    </p>
+
+                                                    <p className="text-xs text-zinc-500 mt-1">
+                                                        You can review the form below and submit your claim.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <div className="mt-6 p-5 rounded-2xl bg-orange-500/5 border border-orange-500/20">
+
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="w-9 h-9 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                                                <AlertCircle
+                                                    size={18}
+                                                    className="text-orange-400"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <p className="text-sm font-semibold text-orange-300">
+                                                    Still needed
+                                                </p>
+
+                                                <p className="text-xs text-zinc-500">
+                                                    Please provide the following information.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            {missingFields.map((field) => (
+                                                <div
+                                                    key={field.id}
+                                                    className="flex items-center gap-3 text-sm text-zinc-300"
+                                                >
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                                                    {field.label}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                    </div>
+                                );
+                            })()}
+
+
+                            
+
+                        </div>
+                    </section>
+                )}
 
                 {/* Stats */}
 
