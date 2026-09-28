@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const claimSchema = new mongoose.Schema(
     {
-
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
         },
+
         formId: {
             type: String,
             required: true
@@ -16,8 +16,34 @@ const claimSchema = new mongoose.Schema(
         data: {
             type: mongoose.Schema.Types.Mixed,
             required: true
-        }
-    }, { timestamps: true }
+        },
+
+        evidence: [
+            {
+                url: {
+                    type: String,
+                    required: true
+                },
+
+                publicId: {
+                    type: String,
+                    required: true
+                },
+
+                resourceType: {
+                    type: String,
+                    required: true
+                },
+
+                originalName: {
+                    type: String
+                }
+            }
+        ]
+    },
+    {
+        timestamps: true
+    }
 );
 
 const Claim = mongoose.model("Claim", claimSchema);
