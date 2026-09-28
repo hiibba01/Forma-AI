@@ -84,10 +84,11 @@ export const submitClaim = async (req, res) => {
 
     } catch (error) {
 
-        console.error(
-            "Claim submission error:",
-            error
-        );
+        console.error("Claim submission error:", {
+            message: error.message,
+            http_code: error.http_code,
+            name: error.name
+        });
 
         res.status(500).json({
             success: false,

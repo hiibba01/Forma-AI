@@ -322,3 +322,105 @@ Example:
         return {};
     }
 };
+
+export const generateClaimSummary = async (story, extractedData) => {
+    const ai = new GoogleGenAI({
+        apiKey: process.env.GEMINI_API_KEY
+    });
+
+    const prompt = `
+You are an insurance claim documentation assistant.
+
+Create a concise, factual summary of the claim.
+
+Original incident description:
+${story}
+
+Extracted claim data:
+${JSON.stringify(extractedData, null, 2)}
+
+Rules:
+- Use only information provided above.
+- Do not invent missing details.
+- Do not assume fault, liability, or claim approval.
+- Mention important incident details and reported damage.
+- Clearly distinguish reported facts from missing information.
+- Do not add recommendations or legal conclusions.
+- Return only the summary text.
+`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash-lite",
+        contents: prompt,
+        config: {
+            temperature: 0
+        }
+    });
+
+    return response.text?.trim() || "";
+};
+
+export const checkClaimConsistency = async (story, extractedData) => {
+    const ai = new GoogleGenAI({
+        apiKey: process.env.GEMINI_API_KEY
+    });
+
+    const prompt = `
+You are an insurance claim consistency checker.
+
+Compare the original incident description with the extracted claim data.
+
+Original description:
+${story}
+
+Extracted claim data:
+${JSON.stringify(extractedData, null, 2)}
+
+Rules:
+- Identify only clear contradictions between the description and extracted data.
+- Do not treat missing information as a contradiction.
+- Accept equivalent wording and reasonable paraphrases.
+- Do not invent facts or infer fraud, fault, or liability.
+- Explain each contradiction briefly, referring to the conflicting values.
+
+Return only valid JSON in this format:
+{
+    "consistent": true,
+    "issues": []
+}
+
+If clear contradictions exist, set "consistent" to false
+and include the explanations in the issues array.
+`;
+
+    const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash-lite",
+        contents: prompt,
+        config: {
+            temperature: 0,
+            responseMimeType: "application/json"
+        }
+    });
+
+    const content = response.text?.trim();
+
+    if (!content) {
+        throw new Error("AI returned an empty consistency result.");
+    }
+
+    const result = JSON.parse(content);
+
+    if (
+        typeof result.consistent !== "boolean" ||
+        !Array.isArray(result.issues)
+    ) {
+        throw new Error("AI returned an invalid consistency result.");
+    }
+
+    return {
+        consistent: result.consistent,
+        issues: result.issues.filter(
+            (issue) => typeof issue === "string"
+        )
+    };
+};
