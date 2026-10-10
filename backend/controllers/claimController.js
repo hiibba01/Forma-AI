@@ -1,5 +1,7 @@
 import Claim from "../models/Claim.model.js";
-import cloudinary from "../config/cloudinary.js";
+import  { toFile } from "@imagekit/nodejs";
+import imagekit from "../config/imagekit.js";
+
 
 export const submitClaim = async (req, res) => {
 
@@ -28,44 +30,31 @@ export const submitClaim = async (req, res) => {
         const evidence = [];
 
         if (req.files && req.files.length > 0) {
-
             for (const file of req.files) {
 
-                const resourceType =
-                    file.mimetype.startsWith("video/")
-                        ? "video"
-                        : "image";
-
-                const result = await new Promise(
-                    (resolve, reject) => {
-
-                        const uploadStream =
-                            cloudinary.uploader.upload_stream(
-                                {
-                                    folder: "forma-ai/claims",
-                                    resource_type: resourceType
-                                },
-                                (error, result) => {
-
-                                    if (error) {
-                                        reject(error);
-                                    } else {
-                                        resolve(result);
-                                    }
-
-                                }
-                            );
-
-                        uploadStream.end(file.buffer);
-                    }
-                );
+                console.log("Upload method:", typeof imagekit?.files?.upload);
+                
+                const result = await imagekit.files.upload({
+                    file: await toFile(
+                        file.buffer,
+                        file.originalname
+                    ),
+                    fileName: file.originalname,
+                    folder: "/forma-ai/claims",
+                    useUniqueFileName: true,
+                    isPrivateFile: true
+                });
 
                 evidence.push({
-                    url: result.secure_url,
-                    publicId: result.public_id,
-                    resourceType,
-                    originalName: file.originalname
-                });
+                url: result.url,
+                fileId: result.fileId,
+                publicId: result.fileId, // Add this line
+                filePath: result.filePath,
+                resourceType: file.mimetype.startsWith("video/")
+                    ? "video"
+                    : "image",
+                originalName: file.originalname
+            });
             }
         }
 
@@ -83,10 +72,9 @@ export const submitClaim = async (req, res) => {
         });
 
     } catch (error) {
-
         console.error("Claim submission error:", {
             message: error.message,
-            http_code: error.http_code,
+            status: error.status,
             name: error.name
         });
 
@@ -94,7 +82,6 @@ export const submitClaim = async (req, res) => {
             success: false,
             message: "Failed to submit claim!"
         });
-
     }
 };
 
